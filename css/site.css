@@ -1,0 +1,238 @@
+/* =========================================================
+   Darshan Patil — portfolio
+   Palette from traditional dyes; motifs from stepwells,
+   palm-leaf manuscripts and jharokha arches.
+   ========================================================= */
+:root{
+  --neel:#0B2230;        /* peacock night — page ground */
+  --neel-2:#0F2C3B;      /* alternate sections */
+  --neel-3:#1F4A5C;      /* line work */
+  --neel-deep:#061820;
+  --haldi:#FFB627;       /* marigold — primary accent */
+  --haldi-soft:#FFD166;
+  --sindoor:#E5397F;     /* rani pink — secondary accent */
+  --tamra:#1FB5A8;       /* peacock teal — AI pillar */
+  --leaf:#DCC48E;        /* palm-leaf */
+  --leaf-edge:#B89A5C;
+  --ink:#2B1D10;
+  --text:#F6EFE0;
+  --muted:#9FBAC4;
+
+  --display:"Rozha One", Georgia, serif;
+  --serif:"Martel", Georgia, serif;
+  --sans:"Mukta", system-ui, sans-serif;
+
+  --step:clamp(1rem, .92rem + .35vw, 1.1rem);
+  --wrap:72rem;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--neel);color:var(--text);font:300 var(--step)/1.75 var(--serif);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:var(--haldi);text-underline-offset:.2em}
+a:focus-visible,button:focus-visible{outline:2px solid var(--haldi);outline-offset:4px;border-radius:2px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Placeholders you need to fill in — easy to spot, search the HTML for class="ph" */
+.ph{outline:1px dashed var(--haldi);outline-offset:2px;background:rgba(255,182,39,.12);padding:0 .25em;border-radius:2px;font-style:normal}
+.leaf .ph{outline-color:#8A5A14;background:rgba(138,90,20,.12)}
+
+/* ---------- Nav ---------- */
+nav{position:fixed;inset:0 0 auto;z-index:20;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+nav.solid{background:color-mix(in srgb,var(--neel) 90%,transparent);backdrop-filter:blur(10px);border-color:var(--neel-3)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:4rem;gap:1rem}
+.mark{font:400 1.7rem/1 var(--display);color:var(--haldi);text-decoration:none;display:flex;align-items:center;gap:.6rem}
+.mark small{font:400 1rem var(--sans);color:var(--text)}
+nav ul{display:flex;gap:clamp(.9rem,2.2vw,1.9rem);list-style:none;margin:0;padding:0;font:400 .98rem var(--sans)}
+nav ul a{color:var(--text);text-decoration:none;position:relative}
+nav ul a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1.5px;background:var(--haldi);transform:scaleX(0);transition:transform .25s}
+nav ul a:hover::after,nav ul a.on::after{transform:scaleX(1)}
+.menu-btn{display:none;background:none;border:1px solid var(--neel-3);color:var(--text);font:600 .9rem var(--sans);padding:.4rem .8rem;cursor:pointer}
+@media (max-width:760px){
+  .menu-btn{display:block}
+  nav ul{position:absolute;top:4rem;left:0;right:0;flex-direction:column;gap:0;background:var(--neel);border-bottom:1px solid var(--neel-3);display:none;padding:.5rem 0}
+  nav ul.open{display:flex}
+  nav ul a{display:block;padding:.75rem clamp(1rem,4vw,2.5rem)}
+  nav ul a::after{display:none}
+}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;
+  background:radial-gradient(ellipse at 85% 15%,rgba(229,57,127,.28) 0%,transparent 45%),radial-gradient(ellipse at 70% 65%,#15475A 0%,var(--neel) 55%,var(--neel-deep) 100%)}
+#stepwell{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(6,24,32,.92) 0%,rgba(6,24,32,.55) 38%,rgba(6,24,32,0) 62%),
+             linear-gradient(0deg,var(--neel) 0%,transparent 22%)}
+.hero .wrap{position:relative;z-index:2;width:100%;padding-top:6rem;padding-bottom:5rem}
+.hero-copy{max-width:36rem}
+.namaste{font:400 1.05rem var(--sans);color:var(--muted);margin:0 0 .6rem;display:flex;align-items:center;gap:.6rem}
+.namaste span{font:400 1.5rem/1 var(--display);color:var(--haldi)}
+.hero h1{font:400 clamp(3.4rem,9vw,7rem)/.92 var(--display);margin:0 0 .5rem;letter-spacing:-.01em;background:linear-gradient(100deg,var(--text) 0%,var(--text) 50%,var(--haldi-soft) 75%,var(--haldi) 90%,var(--sindoor) 115%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 24px rgba(0,0,0,.45))}
+.meaning{font:400 .98rem var(--sans);color:var(--muted);margin:0 0 1.75rem}
+.meaning b{font:400 1.25rem var(--display);color:var(--haldi);font-weight:400;margin-right:.35rem}
+.role{font:400 clamp(1.3rem,2.6vw,1.85rem)/1.35 var(--display);margin:0 0 1.25rem;min-height:2.6em}
+.role .rot{display:inline-grid;vertical-align:top}
+.role .rot span{grid-area:1/1;color:var(--haldi);opacity:0;transform:translateY(.5em);transition:opacity .5s,transform .5s}
+.role .rot span.on{opacity:1;transform:none}
+.lede{font-size:1.1rem;max-width:34rem;margin:0 0 2rem;color:#D9D5C8}
+.actions{display:flex;flex-wrap:wrap;gap:1rem;font-family:var(--sans)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.45rem;font-weight:600;text-decoration:none;border:1.5px solid var(--haldi);transition:background .2s,color .2s,transform .2s}
+.btn.primary{background:var(--haldi);color:var(--neel)}
+.btn.primary:hover{background:var(--haldi-soft);transform:translateY(-2px)}
+.btn.ghost{color:var(--haldi);background:rgba(6,24,32,.4)}
+.btn.ghost:hover{background:rgba(255,182,39,.12)}
+.now{margin-top:2.25rem;display:inline-flex;align-items:center;gap:.7rem;font:400 .95rem var(--sans);color:var(--muted);padding:.5rem .9rem;border:1px solid var(--neel-3);background:rgba(6,24,32,.5)}
+.now i{width:8px;height:8px;border-radius:50%;background:var(--tamra);box-shadow:0 0 0 0 rgba(31,181,168,.7);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(31,181,168,0)}100%{box-shadow:0 0 0 0 rgba(31,181,168,0)}}
+.scroll-cue{position:absolute;z-index:2;left:50%;bottom:1.5rem;transform:translateX(-50%);font:400 .85rem var(--sans);color:var(--muted);text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.scroll-cue::after{content:"";width:1px;height:2.2rem;background:linear-gradient(var(--haldi),transparent);animation:drip 2s infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media (max-width:900px){
+  .hero::after{background:linear-gradient(0deg,rgba(6,24,32,.95) 0%,rgba(6,24,32,.7) 55%,rgba(6,24,32,.35) 100%)}
+}
+
+/* ---------- Marquee band (jaali border + keywords) ---------- */
+.band{border-block:1px solid var(--neel-3);background:var(--neel-deep);overflow:hidden;position:relative}
+.band::before,.band::after{content:"";display:block;height:10px;background:
+  radial-gradient(circle at 5px 5px,var(--haldi) 1.5px,transparent 2px) 0 0/20px 10px}
+.track{display:flex;gap:2.5rem;width:max-content;padding:.9rem 0;animation:marquee 40s linear infinite;font:400 1.35rem/1 var(--display);color:var(--text)}
+.track span{display:flex;align-items:center;gap:2.5rem;white-space:nowrap}
+.track span::after{content:"";width:8px;height:8px;background:var(--sindoor);transform:rotate(45deg)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* ---------- Sections ---------- */
+section{padding:clamp(4.5rem,10vw,7.5rem) 0;position:relative}
+section.alt{background:var(--neel-2)}
+.head{display:flex;align-items:baseline;gap:.4rem 1rem;flex-wrap:wrap;margin-bottom:clamp(2rem,5vw,3.5rem)}
+.head .dev{font:400 clamp(1.1rem,1.6vw,1.35rem)/1 var(--display);color:var(--sindoor);display:inline-flex;align-items:center;gap:.6rem}
+.head .dev::before{content:"";width:7px;height:7px;background:var(--haldi);transform:rotate(45deg)}
+.head h2{font:400 clamp(2.6rem,6vw,4.4rem)/1.02 var(--display);margin:0;letter-spacing:-.01em;background:linear-gradient(100deg,var(--text) 0%,var(--text) 45%,var(--haldi) 80%,var(--sindoor) 110%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.head p{flex-basis:100%;margin:.5rem 0 0;color:var(--muted);max-width:60ch}
+
+/* Reveal on scroll */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- About ---------- */
+.about{display:grid;grid-template-columns:20rem 1fr;gap:clamp(2rem,6vw,5rem);align-items:start}
+.jharokha{position:relative;aspect-ratio:4/5;border-radius:10rem 10rem .4rem .4rem;overflow:hidden;
+  background:linear-gradient(160deg,var(--neel-3),var(--neel-deep));
+  box-shadow:0 0 0 1px var(--haldi),0 0 0 10px var(--neel),0 0 0 11px var(--neel-3),0 30px 60px rgba(0,0,0,.4);
+  display:grid;place-items:center;text-align:center}
+.jharokha img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.jharokha .init{font:400 5rem/1 var(--display);color:var(--haldi)}
+.jharokha .ph{position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);font:400 .85rem var(--sans);white-space:nowrap}
+.about-text p{margin:0 0 1.2rem;max-width:62ch}
+.about-text p:first-child{font:400 clamp(1.3rem,2.2vw,1.6rem)/1.45 var(--display);color:var(--text)}
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:0 2rem;list-style:none;margin:2rem 0 0;padding:0;font-family:var(--sans)}
+.facts li{display:flex;justify-content:space-between;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--neel-3)}
+.facts li span:first-child{color:var(--muted)}
+@media (max-width:820px){.about{grid-template-columns:1fr}.jharokha{max-width:17rem;margin:0 auto}.facts{grid-template-columns:1fr}}
+
+/* ---------- Triveni: three disciplines ---------- */
+.triveni{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1.25rem,3vw,2rem)}
+.pillar{position:relative;padding:5.5rem 1.75rem 2rem;border:1px solid var(--neel-3);border-radius:12rem 12rem .4rem .4rem;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 60%);transition:border-color .3s,transform .3s,box-shadow .3s;--c:var(--haldi)}
+.pillar:hover{border-color:var(--c);transform:translateY(-6px);box-shadow:0 20px 50px -20px var(--c)}
+.pillar.ai{--c:var(--tamra)}
+.pillar.sf{--c:#4FA3E8}
+.pillar .medal{position:absolute;top:1.6rem;left:50%;transform:translateX(-50%);width:4.5rem;height:4.5rem;border-radius:50%;background:var(--leaf);display:grid;place-items:center;box-shadow:0 0 0 4px var(--neel),0 0 0 5px var(--c)}
+.pillar .medal img{width:2.6rem;height:2.6rem}
+.pillar h3{font:400 1.55rem/1.2 var(--display);margin:1.25rem 0 .2rem;text-align:center}
+.pillar .sub{text-align:center;font:400 .95rem var(--sans);color:var(--c);margin:0 0 1.2rem}
+.pillar p{margin:0 0 1.2rem;font-size:.98rem}
+.pillar ul{margin:0;padding:0;list-style:none;font:400 .95rem var(--sans)}
+.pillar li{padding:.4rem 0 .4rem 1.2rem;position:relative;border-top:1px dashed var(--neel-3)}
+.pillar li::before{content:"";position:absolute;left:0;top:.95rem;width:6px;height:6px;background:var(--c);transform:rotate(45deg)}
+@media (max-width:900px){.triveni{grid-template-columns:1fr;max-width:32rem;margin:0 auto}}
+
+/* ---------- Projects: palm-leaf manuscripts ---------- */
+.leaves{display:grid;gap:2.25rem}
+.leaf{
+  position:relative;color:var(--ink);
+  padding:clamp(1.75rem,3.5vw,2.5rem) clamp(1.75rem,7vw,6rem);
+  border-radius:3.5rem / 50%;
+  background:
+    repeating-linear-gradient(180deg,transparent 0 7px,rgba(120,90,40,.09) 7px 8px),
+    linear-gradient(180deg,#E6D1A0,var(--leaf) 55%,#CDB278);
+  box-shadow:inset 0 0 0 1px var(--leaf-edge),inset 0 0 28px rgba(120,80,30,.28),0 14px 30px rgba(5,10,30,.4);
+  transition:transform .4s ease,box-shadow .4s ease;
+}
+.leaf:hover{transform:rotate(-.4deg) translateY(-4px);box-shadow:inset 0 0 0 1px var(--leaf-edge),inset 0 0 28px rgba(120,80,30,.28),0 24px 40px rgba(5,10,30,.5)}
+.leaf::before,.leaf::after{content:"";position:absolute;top:50%;width:13px;height:13px;margin-top:-6.5px;border-radius:50%;background:var(--neel-2);box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 0 0 2px rgba(120,80,30,.35)}
+.leaf::before{left:clamp(.7rem,3vw,2.4rem)}
+.leaf::after{right:clamp(.7rem,3vw,2.4rem)}
+.leaf-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.1rem}
+.tag{display:inline-block;font:600 .8rem var(--sans);padding:.15rem .6rem;border:1px solid currentColor;margin-bottom:.5rem}
+.tag.net{color:#5B2D8E}.tag.sf{color:#0B5CAB}.tag.ai{color:#1F6B57}
+.leaf h3{font:400 clamp(1.6rem,3vw,2.1rem)/1.1 var(--display);margin:0}
+.leaf h3 small{display:block;font:600 1rem/1.4 var(--sans);color:#6A4A1C;margin-top:.3rem}
+.leaf .links{display:flex;gap:1rem;font:600 .92rem var(--sans)}
+.leaf .links a{color:#7C2A1F}
+.leaf-body{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem 2rem;border-top:1px solid rgba(120,80,30,.3);padding-top:1.1rem}
+.leaf-body h4{font:600 .9rem var(--sans);color:#7A5520;margin:0 0 .3rem}
+.leaf-body p{margin:0;font-size:.95rem;font-weight:400;line-height:1.65}
+.leaf-body ul{margin:0;padding-left:1.1rem;font-size:.95rem;font-weight:400;line-height:1.65}
+.stack{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.25rem}
+.stack span{font:600 .82rem var(--sans);color:#4B3214;background:rgba(255,255,255,.35);border:1px solid rgba(120,80,30,.35);padding:.15rem .6rem;border-radius:99px}
+@media (max-width:820px){.leaf-body{grid-template-columns:1fr}.leaf{border-radius:2rem / 6%}}
+.idea-note{margin-top:2rem;color:var(--muted);font-size:.95rem}
+
+/* ---------- Skills ---------- */
+.skill-groups{display:grid;gap:2.75rem}
+.skill-group h3{font:400 1.35rem/1.2 var(--display);margin:0 0 1rem;display:flex;align-items:center;gap:.75rem}
+.skill-group h3::after{content:"";flex:1;height:1px;background:var(--neel-3)}
+.logos{display:grid;grid-template-columns:repeat(auto-fill,minmax(7.25rem,1fr));gap:1rem;list-style:none;margin:0;padding:0}
+.logos li{display:flex;flex-direction:column;align-items:center;gap:.6rem;padding:1.1rem .5rem .9rem;border:1px solid var(--neel-3);background:rgba(6,24,32,.35);text-align:center;font:400 .9rem/1.25 var(--sans);transition:border-color .25s,transform .25s,background .25s}
+.logos li:hover{border-color:var(--haldi);transform:translateY(-4px);background:rgba(255,182,39,.06)}
+.logo{width:3.4rem;height:3.4rem;border-radius:50%;background:var(--leaf);display:grid;place-items:center;box-shadow:inset 0 0 10px rgba(120,80,30,.35)}
+.logo img{width:2rem;height:2rem;object-fit:contain}
+.logo b{font:400 1.05rem/1 var(--display);color:var(--ink)}
+/* Concepts have no logos, so they sit as a wrap of diamond-marked pills */
+.concepts{display:flex;flex-wrap:wrap;gap:.75rem;list-style:none;margin:0;padding:0}
+.concepts li{display:inline-flex;align-items:center;gap:.6rem;padding:.55rem 1.1rem;border:1px solid var(--neel-3);border-radius:99px;background:rgba(6,24,32,.35);font:400 .95rem/1.2 var(--sans);transition:border-color .25s,background .25s}
+.concepts li::before{content:"";width:7px;height:7px;flex:none;background:var(--haldi);transform:rotate(45deg)}
+.concepts li:nth-child(3n+2)::before{background:var(--sindoor)}
+.concepts li:nth-child(3n)::before{background:var(--tamra)}
+.concepts li:hover{border-color:var(--haldi);background:rgba(255,182,39,.08)}
+
+/* ---------- Journey ---------- */
+.journey-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(2rem,6vw,5rem)}
+.journey{list-style:none;margin:0;padding:0;position:relative}
+.journey::before{content:"";position:absolute;left:7px;top:.6rem;bottom:.6rem;width:1px;background:linear-gradient(var(--haldi),var(--neel-3))}
+.journey li{position:relative;padding:0 0 2.5rem 2.75rem}
+.journey li::before{content:"";position:absolute;left:1px;top:.55rem;width:12px;height:12px;background:var(--neel-2);border:1.5px solid var(--haldi);transform:rotate(45deg)}
+.journey li:first-child::before{background:var(--haldi);box-shadow:0 0 14px var(--haldi)}
+.journey time{font:600 .92rem var(--sans);color:var(--muted)}
+.journey h3{font:400 1.4rem/1.3 var(--display);margin:.15rem 0 .1rem}
+.journey .org{font:400 1rem var(--sans);color:var(--haldi);margin:0 0 .5rem}
+.journey ul{margin:0;padding-left:1.1rem;max-width:58ch}
+.journey ul li{padding:0 0 .3rem;}
+.journey ul li::before{display:none}
+.certs h3{font:400 1.35rem var(--display);margin:0 0 1rem}
+.certs ul{list-style:none;margin:0;padding:0;display:grid;gap:.85rem}
+.certs li{display:flex;gap:1rem;align-items:center;padding:1rem;border:1px solid var(--neel-3);background:rgba(6,24,32,.35);font:400 .98rem/1.35 var(--sans)}
+.certs li small{display:block;color:var(--muted)}
+.certs .logo{flex:none;width:2.9rem;height:2.9rem}
+.certs .logo img{width:1.7rem;height:1.7rem}
+@media (max-width:820px){.journey-grid{grid-template-columns:1fr}}
+
+/* ---------- Contact ---------- */
+.contact{text-align:center;overflow:hidden}
+.contact .mandala{position:absolute;left:50%;top:50%;width:min(56rem,140vw);aspect-ratio:1;transform:translate(-50%,-50%);opacity:.18;pointer-events:none;animation:spin 120s linear infinite}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.contact .wrap{position:relative}
+.contact .dev{display:block;font:400 1.35rem/1 var(--display);color:var(--sindoor)}
+.contact h2{font:400 clamp(2.4rem,5.5vw,4rem)/1.1 var(--display);margin:1rem auto;max-width:24ch}
+.contact p{color:var(--muted);margin:0 auto 2rem;max-width:46ch}
+.contact .actions{justify-content:center}
+
+footer{border-top:1px solid var(--neel-3);padding:1.75rem 0;font:400 .9rem var(--sans);color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
