@@ -151,6 +151,20 @@ section.alt{background:var(--neel-2)}
 .pillar li::before{content:"";position:absolute;left:0;top:.95rem;width:6px;height:6px;background:var(--c);transform:rotate(45deg)}
 @media (max-width:900px){.triveni{grid-template-columns:1fr;max-width:32rem;margin:0 auto}}
 
+/* Triveni rivers: each line draws in from its pillar, then dashes keep flowing toward the meeting point */
+.rivers{display:block;width:100%;height:clamp(6rem,11vw,9rem);overflow:visible}
+.rivers.reveal{transform:none}
+.rivers path{fill:none;stroke:var(--c);stroke-linecap:round}
+.rivers .bed{stroke-width:2;opacity:.45;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.8s cubic-bezier(.6,0,.2,1)}
+.rivers .stream .bed{transition-delay:1.5s;transition-duration:.6s}
+.rivers .flow{stroke-width:3;stroke-dasharray:.015 .045;opacity:0;transition:opacity .8s ease 1.6s;animation:flow 2.2s linear infinite}
+.rivers.in .bed{stroke-dashoffset:0}
+.rivers.in .flow{opacity:1}
+@keyframes flow{to{stroke-dashoffset:-.06}}
+.confluence{text-align:center;margin:.75rem 0 0;font:400 1.25rem/1.3 var(--display);color:var(--haldi)}
+.confluence.reveal{transition-delay:1.9s}
+@media (max-width:900px){.rivers,.confluence{display:none}}
+
 /* ---------- Projects: palm-leaf manuscripts ---------- */
 .leaves{display:grid;gap:2.25rem}
 .leaf{
@@ -163,6 +177,13 @@ section.alt{background:var(--neel-2)}
   box-shadow:inset 0 0 0 1px var(--leaf-edge),inset 0 0 28px rgba(120,80,30,.28),0 14px 30px rgba(5,10,30,.4);
   transition:transform .4s ease,box-shadow .4s ease;
 }
+/* Palm-leaf unroll: the leaf opens out from its centre, then the writing appears */
+.leaf.reveal{clip-path:inset(-40px 50% -40px 50%);transition:clip-path 1.2s cubic-bezier(.7,0,.2,1),opacity .5s ease,transform .8s ease,box-shadow .4s ease}
+.leaf.reveal.in{clip-path:inset(-40px -40px -40px -40px)}
+.leaf.reveal > *{opacity:0;transform:translateY(10px);transition:opacity .6s ease .75s,transform .6s ease .75s}
+.leaf.reveal > .leaf-body{transition-delay:.9s}
+.leaf.reveal > .stack{transition-delay:1.05s}
+.leaf.reveal.in > *{opacity:1;transform:none}
 .leaf:hover{transform:rotate(-.4deg) translateY(-4px);box-shadow:inset 0 0 0 1px var(--leaf-edge),inset 0 0 28px rgba(120,80,30,.28),0 24px 40px rgba(5,10,30,.5)}
 .leaf::before,.leaf::after{content:"";position:absolute;top:50%;width:13px;height:13px;margin-top:-6.5px;border-radius:50%;background:var(--neel-2);box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 0 0 2px rgba(120,80,30,.35)}
 .leaf::before{left:clamp(.7rem,3vw,2.4rem)}
@@ -204,10 +225,16 @@ section.alt{background:var(--neel-2)}
 /* ---------- Journey ---------- */
 .journey-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(2rem,6vw,5rem)}
 .journey{list-style:none;margin:0;padding:0;position:relative}
-.journey::before{content:"";position:absolute;left:7px;top:.6rem;bottom:.6rem;width:1px;background:linear-gradient(var(--haldi),var(--neel-3))}
-.journey li{position:relative;padding:0 0 2.5rem 2.75rem}
-.journey li::before{content:"";position:absolute;left:1px;top:.55rem;width:12px;height:12px;background:var(--neel-2);border:1.5px solid var(--haldi);transform:rotate(45deg)}
-.journey li:first-child::before{background:var(--haldi);box-shadow:0 0 14px var(--haldi)}
+.journey::before{content:"";position:absolute;left:7px;top:.6rem;bottom:.6rem;width:1px;background:var(--neel-3)}
+/* Diya wick: a glowing line that burns down the timeline as you scroll (--p set in js/site.js) */
+.journey::after{content:"";position:absolute;left:6px;top:.6rem;bottom:.6rem;width:3px;border-radius:3px;
+  background:linear-gradient(var(--haldi-soft),var(--haldi) 75%,var(--sindoor));box-shadow:0 0 10px var(--haldi);
+  transform-origin:top;transform:scaleY(var(--p,0));will-change:transform}
+.journey > li{position:relative;z-index:1;padding:0 0 2.5rem 2.75rem}
+.journey > li::before{content:"";position:absolute;left:1px;top:.55rem;width:12px;height:12px;background:var(--neel);border:1.5px solid var(--neel-3);transform:rotate(45deg);transition:background .4s,border-color .4s,box-shadow .4s}
+.journey > li.lit::before{background:var(--haldi);border-color:var(--haldi);box-shadow:0 0 12px var(--haldi)}
+.journey > li.lit:first-child::before{animation:flame 1.6s ease-in-out infinite}
+@keyframes flame{0%,100%{box-shadow:0 0 10px 1px var(--haldi)}35%{box-shadow:0 0 18px 4px var(--sindoor)}60%{box-shadow:0 0 13px 2px var(--haldi-soft)}}
 .journey time{font:600 .92rem var(--sans);color:var(--muted)}
 .journey h3{font:400 1.4rem/1.3 var(--display);margin:.15rem 0 .1rem}
 .journey .org{font:400 1rem var(--sans);color:var(--haldi);margin:0 0 .5rem}
@@ -224,7 +251,11 @@ section.alt{background:var(--neel-2)}
 
 /* ---------- Contact ---------- */
 .contact{text-align:center;overflow:hidden}
-.contact .mandala{position:absolute;left:50%;top:50%;width:min(56rem,140vw);aspect-ratio:1;transform:translate(-50%,-50%);opacity:.18;pointer-events:none;animation:spin 120s linear infinite;will-change:transform}
+.contact .mandala{position:absolute;left:50%;top:50%;width:min(56rem,140vw);aspect-ratio:1;transform:translate(-50%,-50%);opacity:.22;pointer-events:none;will-change:transform}
+/* Mandala draws itself ring by ring when Contact comes into view, then starts its slow turn */
+.contact .mandala path,.contact .mandala circle{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.3s ease}
+.contact .mandala.drawn path,.contact .mandala.drawn circle{stroke-dashoffset:0}
+.contact .mandala.spin{animation:spin 120s linear infinite}
 @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 .contact .wrap{position:relative}
 .contact .dev{display:block;font:400 1.35rem/1 var(--display);color:var(--sindoor)}
@@ -239,4 +270,9 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
   *,*::before,*::after{animation:none!important;transition:none!important}
   .reveal{opacity:1;transform:none}
   html{scroll-behavior:auto}
+  .leaf.reveal{clip-path:none}
+  .leaf.reveal > *{opacity:1;transform:none}
+  .rivers .bed,.contact .mandala path,.contact .mandala circle{stroke-dashoffset:0}
+  .rivers .flow{opacity:1}
+  .journey::after{transform:none}
 }

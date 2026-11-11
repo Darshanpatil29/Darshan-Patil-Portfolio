@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Martel:wght@300;400;700&family=Mukta:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/site.css?v=5">
+<link rel="stylesheet" href="css/site.css?v=6">
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
 </head>
 <body>
@@ -78,7 +78,7 @@
         <div class="jharokha reveal">
           <!-- Replace with: <img src="assets/photo.jpg" alt="Darshan Patil"> -->
           <span class="init">DP</span>
-          <span class="ph">[Your photo]</span>
+          <span></span>
         </div>
         <div class="about-text reveal" data-delay="120">
           <p>I’m a software engineer who likes the whole path a request takes: from a Salesforce screen, through a .NET API, to an AI agent that decides what to do next.</p>
@@ -127,6 +127,26 @@
           <ul><li>Apex classes, triggers and tests</li><li>Lightning Web Components</li><li>Flows and approval processes</li><li>REST integrations and Agentforce</li></ul>
         </article>
       </div>
+      <!-- Triveni: the three streams flow out of the pillars and meet in one -->
+      <svg class="rivers reveal" viewBox="0 0 1200 170" preserveAspectRatio="none" aria-hidden="true">
+        <g style="--c:#FFB627">
+          <path class="bed" pathLength="1" vector-effect="non-scaling-stroke" d="M200 0 C200 70 560 70 600 130"/>
+          <path class="flow" pathLength="1" vector-effect="non-scaling-stroke" d="M200 0 C200 70 560 70 600 130"/>
+        </g>
+        <g style="--c:#1FB5A8">
+          <path class="bed" pathLength="1" vector-effect="non-scaling-stroke" d="M600 0 C600 50 600 90 600 130"/>
+          <path class="flow" pathLength="1" vector-effect="non-scaling-stroke" d="M600 0 C600 50 600 90 600 130"/>
+        </g>
+        <g style="--c:#4FA3E8">
+          <path class="bed" pathLength="1" vector-effect="non-scaling-stroke" d="M1000 0 C1000 70 640 70 600 130"/>
+          <path class="flow" pathLength="1" vector-effect="non-scaling-stroke" d="M1000 0 C1000 70 640 70 600 130"/>
+        </g>
+        <g style="--c:#E5397F" class="stream">
+          <path class="bed" pathLength="1" vector-effect="non-scaling-stroke" d="M600 130 L600 170"/>
+          <path class="flow" pathLength="1" vector-effect="non-scaling-stroke" d="M600 130 L600 170"/>
+        </g>
+      </svg>
+      <p class="confluence reveal">Three disciplines, one engineer.</p>
     </div>
   </section>
 
@@ -385,7 +405,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
-<script src="js/site.js?v=5"></script>
+<script src="js/site.js?v=7"></script>
 <!-- The 3D stepwell. Kept inline so the page also works when opened straight from disk. -->
 <script type="module">
 // Three.js hero: a sandstone stepwell (baoli) at night, lit by diyas.

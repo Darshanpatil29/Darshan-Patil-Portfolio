@@ -71,10 +71,40 @@
   const rev = new IntersectionObserver((entries) => {
     entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('in'); rev.unobserve(en.target); } });
   }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach((el, n) => {
-    el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
-    rev.observe(el);
+  // Project leaves start clipped to zero width, which IntersectionObserver treats as never visible,
+  // so they open from a plain position check instead.
+  const leaves = [...document.querySelectorAll('.leaf.reveal')];
+  document.querySelectorAll('.reveal').forEach((el) => {
+    if (el.dataset.delay) el.style.transitionDelay = el.dataset.delay + 'ms';
+    if (!el.classList.contains('leaf')) rev.observe(el);
   });
+  let leafQueued = false;
+  const openLeaves = () => {
+    leafQueued = false;
+    for (let k = leaves.length - 1; k >= 0; k--) {
+      if (leaves[k].getBoundingClientRect().top < innerHeight * 0.85) { leaves[k].classList.add('in'); leaves.splice(k, 1); }
+    }
+    if (!leaves.length) removeEventListener('scroll', onLeafScroll);
+  };
+  const onLeafScroll = () => { if (!leafQueued) { leafQueued = true; requestAnimationFrame(openLeaves); } };
+  if (leaves.length) { addEventListener('scroll', onLeafScroll, { passive: true }); openLeaves(); }
+
+  // Experience timeline: the diya wick burns down as you scroll, lighting each entry it reaches.
+  const journey = document.querySelector('.journey');
+  if (journey) {
+    const items = [...journey.children];
+    let queued = false;
+    const burn = () => {
+      queued = false;
+      const r = journey.getBoundingClientRect();
+      const p = reduce ? 1 : Math.min(1, Math.max(0, (innerHeight * 0.65 - r.top) / r.height));
+      journey.style.setProperty('--p', p.toFixed(4));
+      items.forEach((li) => li.classList.toggle('lit', li.offsetTop / r.height <= p + 0.001));
+    };
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(burn); } }, { passive: true });
+    addEventListener('resize', burn);
+    burn();
+  }
 
   // If a logo fails to load, show its short name instead.
   document.querySelectorAll('.logo img').forEach((img) => {
@@ -101,12 +131,25 @@
         p.setAttribute('fill', 'none');
         p.setAttribute('stroke', k % 2 ? '#FFB627' : '#E5397F');
         p.setAttribute('stroke-width', '1.2');
+        p.setAttribute('pathLength', '1');
+        // Petals draw ring by ring, sweeping around each ring like a blooming flower.
+        p.style.transitionDelay = (k * 0.35 + (j / count) * 0.6).toFixed(3) + 's';
         m.appendChild(p);
       }
       const c = document.createElementNS(NS, 'circle');
       c.setAttribute('cx', 300); c.setAttribute('cy', 300); c.setAttribute('r', r + len + 6);
       c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#1F4A5C'); c.setAttribute('stroke-width', '1');
+      c.setAttribute('pathLength', '1');
+      c.style.transitionDelay = (k * 0.35 + 0.3).toFixed(2) + 's';
       m.appendChild(c);
     });
+    // Draw when Contact comes into view, then start the slow rotation once the bloom finishes.
+    const bloom = new IntersectionObserver(([en]) => {
+      if (!en.isIntersecting) return;
+      bloom.disconnect();
+      m.classList.add('drawn');
+      setTimeout(() => m.classList.add('spin'), reduce ? 0 : 3200);
+    }, { threshold: 0.25 });
+    bloom.observe(m.closest('section'));
   }
 })();
