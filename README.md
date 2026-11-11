@@ -10,7 +10,7 @@ No build step and no backend. Upload the folder as it is and it works.
 | `index.html` | The page. The Three.js stepwell script is inline at the bottom. |
 | `css/site.css` | All styles. Colours are at the top under `:root`. |
 | `js/site.js` | Menu, rotating title, scroll reveals, logo fallbacks, contact mandala. |
-| `assets/` | Your résumé, photo and link-preview image (see `assets/README.md`). |
+| `assets/` | Your photo and link-preview image (see `assets/README.md`). |
 | `favicon.svg` | Browser tab icon. |
 | `404.html` | Shown by GitHub Pages for missing pages. |
 | `.nojekyll` | Tells GitHub Pages to serve files as they are. |
@@ -20,7 +20,8 @@ Three.js, the fonts and the skill logos load from public CDNs (jsDelivr and Goog
 ## Before you publish
 
 1. **Fill in the placeholders.** Search `index.html` for `class="ph"`. Each one has a dashed gold outline on the page.
-2. **Add your files** to `assets/`: `Darshan-Patil-Resume.pdf`, `photo.jpg` and optionally `og-image.png` (1200 × 630).
+2. **Add your files** to `assets/`: `photo.jpg` and optionally `og-image.png` (1200 × 630).
+   **Résumé:** the "View résumé" button opens a Google Drive link. In `index.html`, replace `YOUR_FILE_ID` with the ID from your Drive share link (set to "Anyone with the link → Viewer").
 3. **Update the links**: email, LinkedIn, GitHub and Trailhead in the Contact section, and the project "Source code" / "Live demo" links.
 4. **Update the link-preview URLs** (`og:url`, `og:image`) near the top of `index.html` to your real site address.
 5. **404 page:** if the repo is *not* named `<username>.github.io` and you have no custom domain, change `<base href="/">` in `404.html` to `<base href="/<repo-name>/">`.
