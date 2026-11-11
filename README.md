@@ -1,8 +1,6 @@
 # Darshan Patil — Portfolio
 
 A static portfolio site: HTML, CSS and JavaScript, with a Three.js 3D stepwell in the hero.
-No build step and no backend. Upload the folder as it is and it works.
-
 ## What's in the folder
 
 | Path | What it is |
@@ -16,36 +14,6 @@ No build step and no backend. Upload the folder as it is and it works.
 | `.nojekyll` | Tells GitHub Pages to serve files as they are. |
 
 Three.js, the fonts and the skill logos load from public CDNs (jsDelivr and Google Fonts), so nothing needs installing.
-
-## Before you publish
-
-1. **Fill in the placeholders.** Search `index.html` for `class="ph"`. Each one has a dashed gold outline on the page.
-2. **Add your files** to `assets/`: `photo.jpg` and optionally `og-image.png` (1200 × 630).
-   **Résumé:** the "View résumé" button opens a Google Drive link. In `index.html`, replace `YOUR_FILE_ID` with the ID from your Drive share link (set to "Anyone with the link → Viewer").
-3. **Update the links**: email, LinkedIn, GitHub and Trailhead in the Contact section, and the project "Source code" / "Live demo" links.
-4. **Update the link-preview URLs** (`og:url`, `og:image`) near the top of `index.html` to your real site address.
-5. **404 page:** if the repo is *not* named `<username>.github.io` and you have no custom domain, change `<base href="/">` in `404.html` to `<base href="/<repo-name>/">`.
-
-## Publish on GitHub Pages
-
-1. Create a repository on GitHub.
-   - Named `<username>.github.io` → the site lives at `https://<username>.github.io/`
-   - Any other name, e.g. `portfolio` → `https://<username>.github.io/portfolio/`
-2. Copy everything in this folder into the repository and push to `main`.
-   (`.gitignore` already leaves out the local `.claude/` folder.)
-3. On GitHub: **Settings → Pages → Build and deployment**
-   - Source: **Deploy from a branch**
-   - Branch: **main**, folder **/ (root)** → **Save**
-4. The site is live in a minute or two. Every later push updates it.
-
-### Custom domain (optional)
-
-1. Buy a domain, e.g. `darshanpatil.dev`.
-2. **Settings → Pages → Custom domain**: enter it and save. GitHub adds a `CNAME` file to the repo.
-3. At your domain registrar, add the DNS records GitHub shows you:
-   - `A` records for the root domain → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-   - or a `CNAME` for `www` → `<username>.github.io`
-4. When the certificate is ready, tick **Enforce HTTPS**.
 
 ## Preview locally
 
