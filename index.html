@@ -17,7 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Martel:wght@300;400;700&family=Mukta:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/site.css?v=3">
+<link rel="stylesheet" href="css/site.css?v=5">
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
 </head>
 <body>
@@ -384,11 +384,13 @@
   </div>
 </footer>
 
-<script src="js/site.js?v=4"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<script src="js/site.js?v=5"></script>
 <!-- The 3D stepwell. Kept inline so the page also works when opened straight from disk. -->
 <script type="module">
 // Three.js hero: a sandstone stepwell (baoli) at night, lit by diyas.
 // Scrolling through the hero walks the camera down into the well.
+// Built for smoothness: few draw calls, two real lights, eased camera, adaptive resolution.
 import * as THREE from 'three';
 
 const canvas = document.getElementById('stepwell');
@@ -396,38 +398,36 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 let renderer;
 try {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
 } catch (e) {
   document.documentElement.classList.add('no-webgl');
   throw e;
 }
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+let maxDpr = Math.min(devicePixelRatio, 1.5);
+renderer.setPixelRatio(maxDpr);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x0b2230, 38, 110);
-
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 300);
 
-// ---------- Geometry ----------
 const LEVELS = 12, R = 22, S = 1.5, H = 1.25;
 const well = new THREE.Group();
 scene.add(well);
-
-const sandstone = new THREE.MeshStandardMaterial({ color: 0xc89c62, roughness: 0.92, flatShading: true });
-const sandstoneDark = new THREE.MeshStandardMaterial({ color: 0xa87d48, roughness: 0.95, flatShading: true });
 const box = new THREE.BoxGeometry(1, 1, 1);
+const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3(), sc = new THREE.Vector3();
 
-// Terraces: each level is a square ring, solid down to the floor.
+// ---------- Terraces: every wall block in ONE draw call ----------
 const floorY = -LEVELS * H;
+const terraceMat = new THREE.MeshLambertMaterial({ flatShading: true });
+const terraces = new THREE.InstancedMesh(box, terraceMat, LEVELS * 4);
+const stoneA = new THREE.Color(0xc89c62), stoneB = new THREE.Color(0xa87d48);
+let t4 = 0;
 for (let i = 0; i < LEVELS; i++) {
-  const half = R - i * S;
-  const top = -i * H;
-  const height = top - floorY + 0.01;
-  const y = top - height / 2;
-  const mat = i % 2 ? sandstone : sandstoneDark;
+  const half = R - i * S, top = -i * H;
+  const height = top - floorY + 0.01, y = top - height / 2;
   const parts = [
     [0, y, -(half - S / 2), 2 * half, height, S],
     [0, y, half - S / 2, 2 * half, height, S],
@@ -435,125 +435,132 @@ for (let i = 0; i < LEVELS; i++) {
     [-(half - S / 2), y, 0, S, height, 2 * half - 2 * S],
   ];
   for (const [x, yy, z, sx, sy, sz] of parts) {
-    const m = new THREE.Mesh(box, mat);
-    m.position.set(x, yy, z);
-    m.scale.set(sx, sy, sz);
-    well.add(m);
+    m4.compose(pos.set(x, yy, z), q, sc.set(sx, sy, sz));
+    terraces.setMatrixAt(t4, m4);
+    terraces.setColorAt(t4++, i % 2 ? stoneA : stoneB);
   }
 }
+well.add(terraces);
 
-// Zig-zag stair flights on every inner wall — the stepwell's signature pattern.
+// ---------- Zig-zag stair flights (one draw call) ----------
 const STEPS = 4, SW = 0.42, SH = H / STEPS, SD = 0.32;
 const flights = [];
 for (let i = 0; i < LEVELS - 1; i++) {
-  const d = R - (i + 1) * S;           // distance of the inner face from the centre
-  const top = -i * H;
-  const span = 2 * d - 1.2;
+  const d = R - (i + 1) * S, top = -i * H;
   const triW = STEPS * 2 * SW + 0.5;
-  const count = Math.floor(span / triW);
+  const count = Math.floor((2 * d - 1.2) / triW);
   const start = -((count - 1) * triW) / 2;
   for (let t = 0; t < count; t++) {
     const cx = start + t * triW;
     for (let k = 0; k < STEPS; k++) {
       const y = top - (k + 0.5) * SH;
-      for (const sign of [-1, 1]) {
-        const along = cx + sign * (k + 0.5) * SW;
-        flights.push([along, y, d]);
-      }
+      for (const sign of [-1, 1]) flights.push([cx + sign * (k + 0.5) * SW, y, d]);
     }
   }
 }
-const stepMesh = new THREE.InstancedMesh(box, new THREE.MeshStandardMaterial({ color: 0xe0b878, roughness: 0.85, flatShading: true }), flights.length * 4);
-const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(SW * 0.96, SH * 0.9, SD), pos = new THREE.Vector3();
+const stepMesh = new THREE.InstancedMesh(box, new THREE.MeshLambertMaterial({ color: 0xe0b878, flatShading: true }), flights.length * 4);
 let n = 0;
 for (const [a, y, d] of flights) {
   const faces = [[a, y, -d + SD / 2], [a, y, d - SD / 2], [d - SD / 2, y, a], [-d + SD / 2, y, a]];
   for (let fi = 0; fi < 4; fi++) {
-    const [x, yy, z] = faces[fi];
-    const isSide = fi > 1;
-    sc.set(isSide ? SD : SW * 0.96, SH * 0.9, isSide ? SW * 0.96 : SD);
-    m4.compose(pos.set(x, yy, z), q, sc);
+    const side = fi > 1;
+    m4.compose(pos.set(...faces[fi]), q, sc.set(side ? SD : SW * 0.96, SH * 0.9, side ? SW * 0.96 : SD));
     stepMesh.setMatrixAt(n++, m4);
   }
 }
 well.add(stepMesh);
 
-// Water at the bottom.
+// ---------- Water ----------
 const inner = R - LEVELS * S;
 const water = new THREE.Mesh(
   new THREE.PlaneGeometry(inner * 2, inner * 2),
-  new THREE.MeshStandardMaterial({ color: 0x0a3a44, metalness: 0.7, roughness: 0.1, emissive: 0x0c5a5c, emissiveIntensity: 0.7 })
+  new THREE.MeshPhongMaterial({ color: 0x0a3a44, emissive: 0x0c5a5c, emissiveIntensity: 0.7, shininess: 90, specular: 0x88ffee })
 );
 water.rotation.x = -Math.PI / 2;
 water.position.y = floorY + 0.3;
 well.add(water);
 
-// ---------- Light ----------
-scene.add(new THREE.HemisphereLight(0x7fe0d8, 0x3a1020, 0.6));
-const moon = new THREE.DirectionalLight(0xff8fc0, 0.75);
+// ---------- Light: ambient + 2 directionals + 2 warm diya lights ----------
+scene.add(new THREE.HemisphereLight(0x7fe0d8, 0x3a1020, 0.75));
+const moon = new THREE.DirectionalLight(0xff8fc0, 0.8);
 moon.position.set(-30, 40, -10);
 scene.add(moon);
-const sun = new THREE.DirectionalLight(0xffc78a, 1.6);
+const sun = new THREE.DirectionalLight(0xffc78a, 1.9);
 sun.position.set(25, 30, 30);
 scene.add(sun);
-
-// Diyas: small flames on the corners of a few terraces, each with a flickering light.
-const diyas = [];
-const flameMat = new THREE.MeshBasicMaterial({ color: 0xffb648 });
-const flameGeo = new THREE.SphereGeometry(0.22, 10, 10);
-[[1, 1], [3, -1], [5, 1], [7, -1], [9, 1]].forEach(([lvl, side], idx) => {
-  const half = R - lvl * S - S / 2;
-  const corners = [[half, half], [-half, -half], [half, -half], [-half, half]];
-  corners.forEach(([x, z], c) => {
-    const f = new THREE.Mesh(flameGeo, flameMat);
-    f.position.set(x, -lvl * H + 0.25, z);
-    well.add(f);
-    if (c < 2 && idx % 2 === 0) {
-      const l = new THREE.PointLight(0xff9a3c, 14, 16, 1.6);
-      l.position.copy(f.position).add(new THREE.Vector3(0, 0.6, 0));
-      well.add(l);
-      diyas.push({ l, base: 14, seed: Math.random() * 10 });
-    }
-  });
+const diyaLights = [
+  [R - 3 * S - S / 2, -3 * H + 1, R - 3 * S - S / 2],
+  [-(R - 7 * S - S / 2), -7 * H + 1, -(R - 7 * S - S / 2)],
+].map(([x, y, z], i) => {
+  const l = new THREE.PointLight(0xff9a3c, 40, 26, 1.6);
+  l.position.set(x, y, z);
+  well.add(l);
+  return { l, base: 40, seed: i * 3.7 };
 });
 
-// Embers rising from the water.
-const EMBERS = 260;
+// ---------- Diya flames: instanced cores + additive glow sprites (no extra lights) ----------
+const flamePos = [];
+[1, 3, 5, 7, 9].forEach((lvl) => {
+  const half = R - lvl * S - S / 2;
+  for (const [x, z] of [[half, half], [-half, -half], [half, -half], [-half, half]]) flamePos.push([x, -lvl * H + 0.25, z]);
+});
+const flames = new THREE.InstancedMesh(new THREE.SphereGeometry(0.22, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffb648 }), flamePos.length);
+flamePos.forEach((p, i) => { m4.compose(pos.set(...p), q, sc.set(1, 1, 1)); flames.setMatrixAt(i, m4); });
+well.add(flames);
+
+function glowTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(255,200,110,1)'); grd.addColorStop(0.35, 'rgba(255,150,60,.45)'); grd.addColorStop(1, 'rgba(255,120,40,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const glowGeo = new THREE.BufferGeometry();
+glowGeo.setAttribute('position', new THREE.Float32BufferAttribute(flamePos.flat(), 3));
+const glowMat = new THREE.PointsMaterial({ map: glowTexture(), size: 3.2, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false });
+well.add(new THREE.Points(glowGeo, glowMat));
+
+// ---------- Embers rising from the water ----------
+const EMBERS = 220;
 const emberGeo = new THREE.BufferGeometry();
-const ep = new Float32Array(EMBERS * 3), speed = new Float32Array(EMBERS);
+const ep = new Float32Array(EMBERS * 3), ec = new Float32Array(EMBERS * 3), speed = new Float32Array(EMBERS);
+const marigold = new THREE.Color(0xffc35a), rani = new THREE.Color(0xff5fa2);
 for (let i = 0; i < EMBERS; i++) {
   ep[i * 3] = (Math.random() - 0.5) * R * 1.6;
   ep[i * 3 + 1] = floorY + Math.random() * 30;
   ep[i * 3 + 2] = (Math.random() - 0.5) * R * 1.6;
   speed[i] = 0.6 + Math.random() * 1.4;
+  (Math.random() < 0.3 ? rani : marigold).toArray(ec, i * 3);
 }
-emberGeo.setAttribute('position', new THREE.BufferAttribute(ep, 3));
-const ec = new Float32Array(EMBERS * 3), marigold = new THREE.Color(0xffc35a), rani = new THREE.Color(0xff5fa2);
-for (let i = 0; i < EMBERS; i++) (Math.random() < 0.3 ? rani : marigold).toArray(ec, i * 3);
+emberGeo.setAttribute('position', new THREE.BufferAttribute(ep, 3).setUsage(THREE.DynamicDrawUsage));
 emberGeo.setAttribute('color', new THREE.BufferAttribute(ec, 3));
-const embers = new THREE.Points(emberGeo, new THREE.PointsMaterial({
-  vertexColors: true, size: 0.24, transparent: true, opacity: 0.85,
-  blending: THREE.AdditiveBlending, depthWrite: false,
-}));
-scene.add(embers);
+scene.add(new THREE.Points(emberGeo, new THREE.PointsMaterial({
+  vertexColors: true, size: 0.24, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false,
+})));
 
-// ---------- Interaction ----------
+// Nothing in the well moves, so skip per-frame matrix work for it.
+well.traverse((o) => { o.matrixAutoUpdate = false; o.updateMatrix(); });
+well.updateMatrixWorld(true);
+
+// ---------- Input: targets only; the frame loop eases toward them ----------
 const hero = document.querySelector('.hero');
-let mouseX = 0, mouseY = 0, scrollP = 0;
+let heroH = hero.offsetHeight;
+const target = { x: 0, y: 0, scroll: 0 };
+const cur = { x: 0, y: 0, scroll: 0 };
 addEventListener('pointermove', (e) => {
-  mouseX = e.clientX / innerWidth - 0.5;
-  mouseY = e.clientY / innerHeight - 0.5;
-});
-addEventListener('scroll', () => {
-  const h = hero.offsetHeight;
-  scrollP = Math.min(1, Math.max(0, scrollY / h));
+  target.x = e.clientX / innerWidth - 0.5;
+  target.y = e.clientY / innerHeight - 0.5;
 }, { passive: true });
+const readScroll = () => { target.scroll = Math.min(1, Math.max(0, scrollY / heroH)); };
+addEventListener('scroll', readScroll, { passive: true });
+readScroll();
+cur.scroll = target.scroll;
 
 function resize() {
   const w = canvas.clientWidth, h = canvas.clientHeight;
+  heroH = hero.offsetHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
-  // On wide screens push the well to the right so the headline has room.
   if (w > 900) camera.setViewOffset(w, h, -w * 0.2, 0, w, h);
   else camera.clearViewOffset();
   camera.updateProjectionMatrix();
@@ -561,47 +568,62 @@ function resize() {
 new ResizeObserver(resize).observe(canvas);
 resize();
 
-// Pause rendering when the hero is off screen.
-let visible = true;
-new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(canvas);
-
+// ---------- Loop: runs only while the hero is on screen and the tab is visible ----------
 const clock = new THREE.Clock();
 const look = new THREE.Vector3();
-let intro = reduceMotion ? 1 : 0;
+let intro = reduceMotion ? 1 : 0, raf = 0, running = false;
+let slowFrames = 0, sampled = 0;
 
 function frame() {
-  requestAnimationFrame(frame);
-  if (!visible) return;
+  raf = requestAnimationFrame(frame);
   const dt = Math.min(clock.getDelta(), 0.05);
   const t = clock.elapsedTime;
 
-  // Opening move: the camera swoops in from high above over ~3s.
+  // Adaptive quality: if the first ~2s run slow, drop to 1x resolution.
+  if (sampled < 120) {
+    sampled++;
+    if (dt > 0.024) slowFrames++;
+    if (sampled === 120 && slowFrames > 40 && maxDpr > 1) { maxDpr = 1; renderer.setPixelRatio(1); resize(); }
+  }
+
+  // Ease every input so motion glides instead of jumping.
+  const k = reduceMotion ? 1 : 1 - Math.exp(-dt * 4);
+  cur.x += (target.x - cur.x) * k;
+  cur.y += (target.y - cur.y) * k;
+  cur.scroll += (target.scroll - cur.scroll) * (reduceMotion ? 1 : 1 - Math.exp(-dt * 6));
+
   if (intro < 1) intro = Math.min(1, intro + dt / 3);
   const ease = 1 - Math.pow(1 - intro, 3);
 
-  const angle = (reduceMotion ? 0.6 : 0.6 + t * 0.04) + mouseX * 0.25;
-  const radius = THREE.MathUtils.lerp(78, 52, ease) - scrollP * 26;
-  const height = THREE.MathUtils.lerp(64, 34, ease) - scrollP * 32 - mouseY * 4;
+  const angle = (reduceMotion ? 0.6 : 0.6 + t * 0.04) + cur.x * 0.25;
+  const radius = THREE.MathUtils.lerp(78, 52, ease) - cur.scroll * 26;
+  const height = THREE.MathUtils.lerp(64, 34, ease) - cur.scroll * 32 - cur.y * 4;
   camera.position.set(Math.cos(angle) * radius, height, Math.sin(angle) * radius);
-  look.set(0, -6 - scrollP * 6, 0);
+  look.set(0, -6 - cur.scroll * 6, 0);
   camera.lookAt(look);
 
-  for (const d of diyas) d.l.intensity = d.base * (0.8 + 0.25 * Math.sin(t * 9 + d.seed) * Math.sin(t * 3.3 + d.seed));
-
   if (!reduceMotion) {
+    for (const d of diyaLights) d.l.intensity = d.base * (0.85 + 0.15 * Math.sin(t * 9 + d.seed) * Math.sin(t * 3.3 + d.seed));
+    glowMat.opacity = 0.8 + 0.1 * Math.sin(t * 7);
     const p = emberGeo.attributes.position.array;
     for (let i = 0; i < EMBERS; i++) {
-      p[i * 3 + 1] += speed[i] * dt;
-      p[i * 3] += Math.sin(t + i) * 0.004;
-      if (p[i * 3 + 1] > 14) p[i * 3 + 1] = floorY;
+      const j = i * 3;
+      p[j + 1] += speed[i] * dt;
+      p[j] += Math.sin(t + i) * 0.004;
+      if (p[j + 1] > 14) p[j + 1] = floorY;
     }
     emberGeo.attributes.position.needsUpdate = true;
   }
   renderer.render(scene, camera);
 }
-frame();
-document.documentElement.classList.add('webgl-ready');
+function start() { if (!running) { running = true; clock.getDelta(); raf = requestAnimationFrame(frame); } }
+function stop() { running = false; cancelAnimationFrame(raf); }
 
+let onScreen = true;
+new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; onScreen && !document.hidden ? start() : stop(); }).observe(canvas);
+document.addEventListener('visibilitychange', () => { onScreen && !document.hidden ? start() : stop(); });
+start();
+document.documentElement.classList.add('webgl-ready');
 </script>
 </body>
 </html>

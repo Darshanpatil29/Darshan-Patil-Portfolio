@@ -17,9 +17,29 @@
     exp.textContent = [part(y, 'year'), part(m, 'month')].filter(Boolean).join(' ') || 'Less than a month';
   }
 
+  // Smooth, eased scrolling for mouse wheels and trackpads (touch stays native).
+  // Skipped when the visitor asks for reduced motion or the library didn't load.
+  let lenis = null;
+  if (!reduce && window.Lenis) {
+    lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 4), smoothWheel: true });
+    const tick = (time) => { lenis.raf(time); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    // In-page links (nav, buttons) glide to their section, leaving room for the fixed nav.
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a || a.getAttribute('href') === '#') return;
+      const el = document.querySelector(a.getAttribute('href'));
+      if (!el) return;
+      e.preventDefault();
+      lenis.scrollTo(el, { offset: el.id === 'top' ? 0 : -64 });
+      history.replaceState(null, '', a.getAttribute('href'));
+    });
+  }
+
   // Nav turns solid once you leave the hero; mobile menu toggle.
   const nav = document.querySelector('nav');
-  const onScroll = () => nav.classList.toggle('solid', scrollY > 40);
+  let solid = null;
+  const onScroll = () => { const s = scrollY > 40; if (s !== solid) { solid = s; nav.classList.toggle('solid', s); } };
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
   const btn = document.querySelector('.menu-btn'), list = document.getElementById('menu');
